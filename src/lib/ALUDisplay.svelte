@@ -17,7 +17,7 @@
 
 <div class="card" class:active={isActive}>
   <div class="card-header">
-    <h3 class="card-title">산술논리장치 (ALU)</h3>
+    <h3 class="card-title">현재 상태 (혹은, ALU)</h3>
   </div>
   <div class="card-content">
     <div class="operation-display" class:computing={isActive}>

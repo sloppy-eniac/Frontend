@@ -7,6 +7,7 @@ export default class WebSocketManager {
     this.maxReconnectAttempts = 5;
     this.reconnectDelay = 1000;
     this.heartbeatInterval = null;
+    this.manualDisconnect = false;
     
     this.connect();
   }
@@ -53,6 +54,15 @@ export default class WebSocketManager {
       case 'state':
         this.callbacks.onState?.(message.payload);
         break;
+      case 'memory':
+        this.callbacks.onMemory?.(message.payload);
+        break;
+      case 'cache':
+        this.callbacks.onCache?.(message.payload);
+        break;
+      case 'execution':
+        this.callbacks.onExecution?.(message.payload);
+        break;
       case 'ack':
         this.callbacks.onAck?.(message.payload);
         break;
@@ -76,15 +86,18 @@ export default class WebSocketManager {
   }
   
   reconnect() {
-    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+    // 개발 환경에서는 재연결 제한
+    if (this.reconnectAttempts < this.maxReconnectAttempts && !this.manualDisconnect) {
       this.reconnectAttempts++;
       console.log(`재연결 시도 ${this.reconnectAttempts}/${this.maxReconnectAttempts}`);
       
       setTimeout(() => {
-        this.connect();
+        if (!this.manualDisconnect) {
+          this.connect();
+        }
       }, this.reconnectDelay * this.reconnectAttempts);
     } else {
-      console.error('최대 재연결 시도 횟수 초과');
+      console.error('최대 재연결 시도 횟수 초과 또는 수동 연결 해제');
       this.callbacks.onMaxReconnectReached?.();
     }
   }
@@ -103,6 +116,7 @@ export default class WebSocketManager {
   }
   
   close() {
+    this.manualDisconnect = true;
     this.stopHeartbeat();
     if (this.ws) {
       this.ws.close();
