@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  cpu-backend:
+    build:
+      context: ./cpu
+      dockerfile: Dockerfile
+    container_name: cpu-simulator-backend
+    ports:
+      - "8080:8080"
+    networks:
+      - cpu-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: cpu-simulator-frontend
+    ports:
+      - "4173:4173"
+    networks:
+      - cpu-network
+    depends_on:
+      - cpu-backend
+    restart: unless-stopped
+    environment:
+      - VITE_CPU_WEBSOCKET_URL=ws://cpu-backend:8080
+
+networks:
+  cpu-network:
+    driver: bridge 
