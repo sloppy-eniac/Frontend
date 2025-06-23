@@ -54,6 +54,85 @@ MOV 200, 51`;
   function setExampleInstruction(instruction) {
     singleInstruction = instruction;
   }
+  
+  // 🚀 테스트 시나리오 함수들
+  async function runFullTest() {
+    try {
+      await cpuClient.reset();
+      console.log('🎯 전체 테스트 시작');
+      
+      // 1. MOV R4, 32
+      await cpuClient.executeAssembly('MOV R4, 32');
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // 2. MOV R2, 50  
+      await cpuClient.executeAssembly('MOV R2, 50');
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // 3. ADD R4, R2
+      await cpuClient.executeAssembly('ADD R4, R2');
+      
+      console.log('✅ 전체 테스트 완료');
+    } catch (error) {
+      console.error('❌ 전체 테스트 오류:', error);
+    }
+  }
+  
+  async function runAddTest() {
+    try {
+      await cpuClient.reset();
+      console.log('🚀 ADD 테스트 시작');
+      
+      // R4 = 32, R2 = 50 설정 후 ADD
+      await cpuClient.executeAssembly('MOV R4, 32');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      await cpuClient.executeAssembly('MOV R2, 50');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      await cpuClient.executeAssembly('ADD R4, R2');
+      
+      console.log('✅ ADD 테스트 완료 - 결과는 R7에 82가 저장되어야 함');
+    } catch (error) {
+      console.error('❌ ADD 테스트 오류:', error);
+    }
+  }
+  
+  async function runMathTest() {
+    try {
+      await cpuClient.reset();
+      console.log('🧮 수학 연산 테스트 시작');
+      
+      // 다양한 연산 테스트
+      await cpuClient.executeAssembly('MOV R1, 10');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      await cpuClient.executeAssembly('MOV R2, 5');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      await cpuClient.executeAssembly('ADD R1, R2');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      await cpuClient.executeAssembly('SUB R1, R2');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      await cpuClient.executeAssembly('MUL R1, R2');
+      
+      console.log('✅ 수학 연산 테스트 완료');
+    } catch (error) {
+      console.error('❌ 수학 연산 테스트 오류:', error);
+    }
+  }
+  
+  async function clearAll() {
+    try {
+      await cpuClient.reset();
+      assemblyInput = '';
+      console.log('🧹 전체 초기화 완료');
+    } catch (error) {
+      console.error('❌ 초기화 오류:', error);
+    }
+  }
 </script>
 
 <div class="control-panel">
@@ -177,6 +256,50 @@ MOV 200, 51`;
         {/if}
       </div>
     </div>
+  </div>
+  
+  <h3>🎯 명령어 예제</h3>
+  <div class="examples">
+    <button on:click={() => assemblyInput = 'MOV R4, 32'} class="example-btn">
+      MOV R4, 32
+    </button>
+    <button on:click={() => assemblyInput = 'MOV R2, 50'} class="example-btn">
+      MOV R2, 50
+    </button>
+    <button on:click={() => assemblyInput = 'ADD R4, R2'} class="example-btn">
+      ADD R4, R2
+    </button>
+    <button on:click={() => assemblyInput = 'SUB R4, R2'} class="example-btn">
+      SUB R4, R2
+    </button>
+    <button on:click={() => assemblyInput = 'MUL R4, R2'} class="example-btn">
+      MUL R4, R2
+    </button>
+    <button on:click={() => assemblyInput = 'DIV R4, R2'} class="example-btn">
+      DIV R4, R2
+    </button>
+    <button on:click={() => assemblyInput = 'MOV R1, 100'} class="example-btn">
+      MOV R1, 100
+    </button>
+    <button on:click={() => assemblyInput = 'MOV R3, 255'} class="example-btn">
+      MOV R3, 255
+    </button>
+  </div>
+  
+  <h3>🚀 테스트 시나리오</h3>
+  <div class="test-scenarios">
+    <button on:click={runFullTest} class="test-btn">
+      전체 테스트 실행
+    </button>
+    <button on:click={runAddTest} class="test-btn">
+      ADD 테스트 (R4+R2)
+    </button>
+    <button on:click={runMathTest} class="test-btn">
+      수학 연산 테스트
+    </button>
+    <button on:click={clearAll} class="clear-btn">
+      전체 초기화
+    </button>
   </div>
 </div>
 
@@ -407,5 +530,81 @@ MOV 200, 51`;
     font-size: 0.875rem;
     color: hsl(222.2 84% 4.9%);
     font-weight: 600;
+  }
+  
+  .examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+  
+  .example-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: 'Courier New', monospace;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .example-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+  
+  .test-scenarios {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+  
+  .test-btn {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .test-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
+  }
+  
+  .clear-btn {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .clear-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  }
+  
+  h3 {
+    color: #2c3e50;
+    margin: 1.5rem 0 0.8rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  
+  h3:first-of-type {
+    margin-top: 1rem;
   }
 </style> 
