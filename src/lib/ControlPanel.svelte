@@ -540,9 +540,8 @@ MOV 200, 51`;
   }
   
   .example-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
+    border: 1px solid #cfcfcf;
+    color: rgb(140, 140, 140);
     padding: 8px 12px;
     border-radius: 6px;
     font-size: 0.9rem;
