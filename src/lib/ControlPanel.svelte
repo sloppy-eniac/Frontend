@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   
   export let cpuState;
+  export let errorMessages = [];
   
   const dispatch = createEventDispatcher();
   
@@ -133,6 +134,46 @@ MOV 200, 51`;
       console.error('❌ 초기화 오류:', error);
     }
   }
+
+  async function runUnderflowTest() {
+    try {
+      await cpuClient.reset();
+      console.log('🚨 오버플로우 테스트 시작 (양수 - 음수)');
+      
+      // R1 = 100 (양수), R2 = 200 (8비트에서는 -56) 설정 후 SUB
+      await cpuClient.executeAssembly('MOV R1, 100');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      await cpuClient.executeAssembly('MOV R2, 200');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      await cpuClient.executeAssembly('SUB R1, R2');
+      
+      console.log('✅ 오버플로우 테스트 완료 - 양수에서 음수를 빼서 범위 초과, OF=1이 되어야 함');
+    } catch (error) {
+      console.error('❌ 오버플로우 테스트 오류:', error);
+    }
+  }
+
+  async function runOverflowTest() {
+    try {
+      await cpuClient.reset();
+      console.log('⚠️  오버플로우 테스트 시작 (양수 + 양수 = 음수)');
+      
+      // R3 = 100 (양수), R4 = 50 (양수) 설정 후 ADD
+      await cpuClient.executeAssembly('MOV R3, 100');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      await cpuClient.executeAssembly('MOV R4, 50');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      await cpuClient.executeAssembly('ADD R3, R4');
+      
+      console.log('✅ 오버플로우 테스트 완료 - 양수+양수=음수로 부호 오버플로우, OF=1이 되어야 함');
+    } catch (error) {
+      console.error('❌ 오버플로우 테스트 오류:', error);
+    }
+  }
 </script>
 
 <div class="control-panel">
@@ -140,6 +181,26 @@ MOV 200, 51`;
     <div class="status-indicator" class:connected={cpuState.connected}></div>
     <span class="status-text">{cpuState.connected ? 'CPU 서버 연결됨' : 'CPU 서버 연결 안됨'}</span>
   </div>
+  
+  <!-- 에러 메시지 표시 영역 -->
+  {#if errorMessages && errorMessages.length > 0}
+    <div class="error-panel">
+      <div class="error-header">
+        <h3 class="error-title">🚨 오류/경고 메시지</h3>
+        <button class="clear-errors-btn" on:click={() => dispatch('clearErrors')}>
+          지우기
+        </button>
+      </div>
+      <div class="error-messages">
+        {#each errorMessages as message, index}
+          <div class="error-message" class:warning={message.includes('⚠️')} class:error={message.includes('🚨')}>
+            <span class="error-text">{message}</span>
+            <span class="error-time">{new Date().toLocaleTimeString()}</span>
+          </div>
+        {/each}
+      </div>
+    </div>
+  {/if}
   
   <!-- 단일 명령어 실행 -->
   <div class="card">
@@ -172,7 +233,6 @@ MOV 200, 51`;
           <button class="example-btn" on:click={() => setExampleInstruction('ADD 5, 10')}>ADD 5, 10</button>
           <button class="example-btn" on:click={() => setExampleInstruction('SUB 15, 3')}>SUB 15, 3</button>
           <button class="example-btn" on:click={() => setExampleInstruction('MUL 4, 6')}>MUL 4, 6</button>
-          <button class="example-btn" on:click={() => setExampleInstruction('DIV 20, 4')}>DIV 20, 4</button>
         </div>
       </div>
     </div>
@@ -296,6 +356,12 @@ MOV 200, 51`;
     </button>
     <button on:click={runMathTest} class="test-btn">
       수학 연산 테스트
+    </button>
+    <button on:click={runUnderflowTest} class="error-test-btn">
+      🚨 오버플로우 테스트 (SUB)
+    </button>
+    <button on:click={runOverflowTest} class="error-test-btn">
+      ⚠️ 오버플로우 테스트 (ADD)
     </button>
     <button on:click={clearAll} class="clear-btn">
       전체 초기화
@@ -595,6 +661,23 @@ MOV 200, 51`;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
   }
+
+  .error-test-btn {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    color: #8b0000;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .error-test-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 154, 158, 0.3);
+  }
   
   h3 {
     color: #2c3e50;
@@ -605,5 +688,92 @@ MOV 200, 51`;
   
   h3:first-of-type {
     margin-top: 1rem;
+  }
+
+  /* 에러 패널 스타일 */
+  .error-panel {
+    background: hsl(0 100% 98%);
+    border: 1px solid hsl(0 84% 60%);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
+  }
+
+  .error-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .error-title {
+    color: hsl(0 84% 60%);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .clear-errors-btn {
+    background: hsl(0 84% 60%);
+    color: white;
+    border: none;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .clear-errors-btn:hover {
+    background: hsl(0 84% 55%);
+  }
+
+  .error-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .error-message {
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 0.875rem;
+  }
+
+  .error-message.warning {
+    background: hsl(48 100% 96%);
+    border: 1px solid hsl(48 96% 53%);
+    color: hsl(25 95% 53%);
+  }
+
+  .error-message.error {
+    background: hsl(0 100% 97%);
+    border: 1px solid hsl(0 84% 60%);
+    color: hsl(0 84% 60%);
+  }
+
+  .error-text {
+    flex: 1;
+  }
+
+  .error-time {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-left: 1rem;
+  }
+
+  .error-example {
+    background: hsl(0 100% 98%) !important;
+    border-color: hsl(0 84% 60%) !important;
+    color: hsl(0 84% 60%) !important;
+  }
+
+  .error-example:hover {
+    background: hsl(0 100% 95%) !important;
   }
 </style> 

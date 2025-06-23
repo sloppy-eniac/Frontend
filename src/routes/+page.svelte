@@ -41,7 +41,6 @@
       },
       onError: (error) => {
         console.error('CPU 오류:', error);
-        // 에러 표시 UI 추가 가능
       }
     });
     
@@ -115,6 +114,12 @@
       console.error('❌ CPUClient가 없습니다!');
     }
   }
+
+  function handleClearErrors() {
+    if (cpuClient) {
+      cpuClient.clearErrorMessages();
+    }
+  }
 </script>
 
 <main>
@@ -127,8 +132,10 @@
     <div class="layout">
       <ControlPanel 
         {cpuState}
+        errorMessages={cpuClient ? cpuClient.getErrorMessages() : []}
         on:command={handleCommand}
         on:assembly={handleAssemblyCommand}
+        on:clearErrors={handleClearErrors}
       />
       
       <CPUVisualizer {cpuState} />

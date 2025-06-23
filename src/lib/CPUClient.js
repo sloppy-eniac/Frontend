@@ -14,7 +14,8 @@ export default class CPUClient {
         register4: 0,
         register5: 0,
         register6: 0,
-        register7: 0
+        register7: 0,
+        overflow_flag: false
       },
       memory: new Array(256).fill(0),
       alu: '대기 중...',
@@ -24,6 +25,8 @@ export default class CPUClient {
       lastAssembly: '',
       decodedBytes: []
     };
+    
+    this.errorMessages = [];
     
     this.connect();
   }
@@ -78,6 +81,7 @@ export default class CPUClient {
       
       onError: (error) => {
         console.error('CPU 서버 오류:', error);
+        this.addErrorMessage(error);
         this.callbacks.onError?.(error);
       }
     });
@@ -92,6 +96,7 @@ export default class CPUClient {
     this.cpuState.registers.register5 = state.register5 || 0;
     this.cpuState.registers.register6 = state.register6 || 0;
     this.cpuState.registers.register7 = state.register7 || 0;
+    this.cpuState.registers.overflow_flag = state.overflow_flag || false;
     
     this.notifyStateChange();
   }
@@ -342,6 +347,30 @@ export default class CPUClient {
       this.wsManager = null;
     }
     this.cpuState.connected = false;
+    this.notifyStateChange();
+  }
+
+  // 에러 메시지 관리
+  addErrorMessage(message) {
+    this.errorMessages.push({
+      message: message,
+      timestamp: new Date().toISOString()
+    });
+    
+    // 최대 10개의 에러 메시지만 유지
+    if (this.errorMessages.length > 10) {
+      this.errorMessages.shift();
+    }
+    
+    this.notifyStateChange();
+  }
+
+  getErrorMessages() {
+    return this.errorMessages.map(error => error.message);
+  }
+
+  clearErrorMessages() {
+    this.errorMessages = [];
     this.notifyStateChange();
   }
 } 
