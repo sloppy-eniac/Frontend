@@ -105,8 +105,14 @@
   
   function handleAssemblyCommand(event) {
     const assemblyCode = event.detail;
+    console.log('🎯 assembly 이벤트 수신:', assemblyCode);
+    
     if (cpuClient) {
-      cpuClient.executeAssembly(assemblyCode);
+      console.log('📡 CPUClient로 executeAssembly 호출');
+      const result = cpuClient.executeAssembly(assemblyCode);
+      console.log('✅ executeAssembly 결과:', result);
+    } else {
+      console.error('❌ CPUClient가 없습니다!');
     }
   }
 </script>

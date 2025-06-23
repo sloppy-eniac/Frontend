@@ -12,7 +12,7 @@
   let previousValues = { ...registers };
   let highlightedRegs = {};
   
-  // 레지스터 이름 매핑
+  // 레지스터 이름 매핑 (R7을 resultR로 변경)
   const registerNames = {
     register1: 'R1',
     register2: 'R2', 
@@ -20,7 +20,7 @@
     register4: 'R4',
     register5: 'R5',
     register6: 'R6',
-    register7: 'R7'
+    register7: 'resultR'  // R7을 resultR로 표시
   };
   
   $: {
@@ -48,10 +48,11 @@
         <div 
           class="register-item" 
           class:highlight={highlightedRegs[regKey]}
+          class:result-register={regKey === 'register7'}
         >
           <div class="register-name">{registerNames[regKey]}</div>
           <div class="register-value">{value}</div>
-          <div class="register-info">{regKey}</div>
+          <div class="register-info">{regKey === 'register7' ? '연산결과' : regKey}</div>
         </div>
       {/each}
     </div>
@@ -152,6 +153,21 @@
     font-size: 0.75rem;
     color: hsl(215.4 16.3% 46.9%);
     font-family: ui-monospace, SFMono-Regular, monospace;
+  }
+  
+  .register-item.result-register {
+    background: linear-gradient(135deg, hsl(120 100% 95%), hsl(120 100% 90%));
+    border-color: hsl(120 100% 70%);
+  }
+  
+  .register-item.result-register .register-name {
+    color: hsl(120 100% 30%);
+    font-weight: 700;
+  }
+  
+  .register-item.result-register .register-value {
+    border-color: hsl(120 100% 70%);
+    background: hsl(120 100% 98%);
   }
   
   @media (max-width: 640px) {

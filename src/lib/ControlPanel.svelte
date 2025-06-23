@@ -40,6 +40,7 @@ MOV 200, 51`;
   // 단일 어셈블리 명령어 실행
   function executeSingleInstruction() {
     if (singleInstruction.trim()) {
+      console.log('🚀 단일 명령어 실행 버튼 클릭:', singleInstruction.trim());
       dispatch('assembly', singleInstruction.trim());
     }
   }
@@ -86,11 +87,13 @@ MOV 200, 51`;
       <div class="example-instructions">
         <h4>예제 명령어:</h4>
         <div class="example-buttons">
+          <button class="example-btn" on:click={() => setExampleInstruction('MOV R4, 32')}>MOV R4, 32</button>
+          <button class="example-btn" on:click={() => setExampleInstruction('MOV R1, 100')}>MOV R1, 100</button>
+          <button class="example-btn" on:click={() => setExampleInstruction('MOV R2, 50')}>MOV R2, 50</button>
           <button class="example-btn" on:click={() => setExampleInstruction('ADD 5, 10')}>ADD 5, 10</button>
           <button class="example-btn" on:click={() => setExampleInstruction('SUB 15, 3')}>SUB 15, 3</button>
           <button class="example-btn" on:click={() => setExampleInstruction('MUL 4, 6')}>MUL 4, 6</button>
           <button class="example-btn" on:click={() => setExampleInstruction('DIV 20, 4')}>DIV 20, 4</button>
-          <button class="example-btn" on:click={() => setExampleInstruction('MOV 255, 32')}>MOV 255, 32</button>
         </div>
       </div>
     </div>

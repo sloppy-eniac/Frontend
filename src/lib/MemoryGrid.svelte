@@ -55,6 +55,26 @@
     return memory[index] !== 0;
   }
 
+  // MOV 또는 연산 결과로 변경된 데이터 영역 판별
+  function isResultDataArea(index) {
+    if (isInstructionArea(index)) return false;
+    
+    // 50번 이후 또는 70-73 영역에 0이 아닌 값이 있으면 저장된 데이터
+    const hasData = memory[index] !== 0;
+    const isDataArea = index >= 50 || (index >= 70 && index <= 73);
+    
+    return hasData && isDataArea;
+  }
+
+  // 연산 결과 영역인지 확인 (디버깅 정보 추가)
+  function isArithmeticResultArea(index) {
+    const isResult = index >= 70 && index <= 73 && memory[index] !== 0;
+    if (isResult) {
+      console.log(`연산 결과 감지: 주소 ${index}, 값 ${memory[index]}`);
+    }
+    return isResult;
+  }
+
   // 명령어 바이트를 어셈블리로 변환
   function getInstructionText(index) {
     if (index % 2 !== 0 || index + 1 >= memory.length) return '';
@@ -66,9 +86,11 @@
     
     // 16비트 명령어 재구성
     const instruction = (byte1 << 8) | byte2;
+    
+    // 수정된 비트 배치: 4비트 opcode + 6비트 reg1 + 6비트 reg2
     const opcode = (instruction >> 12) & 0xF;
-    const reg1 = (instruction >> 4) & 0xFF;
-    const reg2 = instruction & 0xF;
+    const reg1 = (instruction >> 6) & 0x3F;  // 6비트
+    const reg2 = instruction & 0x3F;         // 6비트
     
     const opcodes = ['ADD', 'SUB', 'MUL', 'DIV', 'MOV'];
     if (opcode < opcodes.length) {
@@ -90,7 +112,11 @@
         </div>
         <div class="legend-item">
           <div class="legend-color mov-data"></div>
-          <span>MOV 데이터</span>
+          <span>저장된 데이터</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color arithmetic-result"></div>
+          <span>연산 결과</span>
         </div>
         <div class="legend-item">
           <div class="legend-color data"></div>
@@ -106,8 +132,9 @@
           class="memory-cell"
           class:highlight={highlightedCells[index]}
           class:instruction-area={isInstructionArea(index)}
-          class:mov-data-area={isMovDataArea(index)}
-          title="{isInstructionArea(index) && index % 2 === 0 ? `명령어: ${getInstructionText(index)} | ` : ''}주소: 0x{index.toString(16).padStart(2, '0').toUpperCase()}, 값: {value} (0x{value.toString(16).padStart(2, '0').toUpperCase()})"
+          class:mov-data-area={isResultDataArea(index)}
+          class:arithmetic-result={isArithmeticResultArea(index)}
+          title="{isInstructionArea(index) && index % 2 === 0 ? `명령어: ${getInstructionText(index)} | ` : ''}{isArithmeticResultArea(index) ? '연산 결과 | ' : ''}주소: 0x{index.toString(16).padStart(2, '0').toUpperCase()}, 값: {value} (0x{value.toString(16).padStart(2, '0').toUpperCase()})"
         >
           <div class="address">{index.toString(16).padStart(2, '0').toUpperCase()}</div>
           <div class="value">0x{value.toString(16).padStart(2, '0').toUpperCase()}</div>
@@ -234,6 +261,50 @@
     font-weight: 700;
   }
   
+  .memory-cell.result-data-area {
+    background: linear-gradient(135deg, hsl(142 76% 92%), hsl(142 76% 88%));
+    border-color: hsl(142 76% 75%);
+    box-shadow: 0 2px 4px 0 hsl(142 76% 75% / 0.4);
+  }
+  
+  .memory-cell.result-data-area:hover {
+    background: linear-gradient(135deg, hsl(142 76% 90%), hsl(142 76% 86%));
+    border-color: hsl(142 76% 70%);
+    transform: scale(1.05);
+  }
+  
+  .memory-cell.result-data-area .address {
+    color: hsl(142 76% 35%);
+    font-weight: 600;
+  }
+  
+  .memory-cell.result-data-area .value {
+    color: hsl(142 76% 20%);
+    font-weight: 700;
+  }
+  
+  .memory-cell.arithmetic-result-area {
+    background: linear-gradient(135deg, hsl(142 76% 92%), hsl(142 76% 88%));
+    border-color: hsl(142 76% 75%);
+    box-shadow: 0 2px 4px 0 hsl(142 76% 75% / 0.4);
+  }
+  
+  .memory-cell.arithmetic-result-area:hover {
+    background: linear-gradient(135deg, hsl(142 76% 90%), hsl(142 76% 86%));
+    border-color: hsl(142 76% 70%);
+    transform: scale(1.05);
+  }
+  
+  .memory-cell.arithmetic-result-area .address {
+    color: hsl(142 76% 35%);
+    font-weight: 600;
+  }
+  
+  .memory-cell.arithmetic-result-area .value {
+    color: hsl(142 76% 20%);
+    font-weight: 700;
+  }
+  
   @keyframes memoryPulse {
     0% { 
       box-shadow: 0 0 0 2px hsl(0 84.2% 60.2% / 0.2);
@@ -323,5 +394,32 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
+  }
+
+  .memory-cell.arithmetic-result {
+    background: linear-gradient(135deg, hsl(120 100% 92%), hsl(120 100% 88%));
+    border-color: hsl(120 100% 65%);
+    box-shadow: 0 2px 4px 0 hsl(120 100% 65% / 0.4);
+  }
+  
+  .memory-cell.arithmetic-result:hover {
+    background: linear-gradient(135deg, hsl(120 100% 90%), hsl(120 100% 86%));
+    border-color: hsl(120 100% 60%);
+    transform: scale(1.05);
+  }
+  
+  .memory-cell.arithmetic-result .address {
+    color: hsl(120 100% 25%);
+    font-weight: 600;
+  }
+  
+  .memory-cell.arithmetic-result .value {
+    color: hsl(120 100% 15%);
+    font-weight: 700;
+  }
+
+  .legend-color.arithmetic-result {
+    background: linear-gradient(135deg, hsl(120 100% 85%), hsl(120 100% 75%));
+    border: 1px solid hsl(120 100% 65%);
   }
 </style> 

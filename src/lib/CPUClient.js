@@ -258,9 +258,39 @@ export default class CPUClient {
   
   // 단일 명령어 실행
   executeAssembly(assemblyCode) {
-    return this.sendAssemblyCode(assemblyCode);
+    if (!this.wsManager || !this.wsManager.isConnected()) {
+      console.warn('CPU 서버에 연결되지 않음');
+      return false;
+    }
+    
+    console.log('단일 명령어 실행:', assemblyCode);
+    
+    // 1. CPU 리셋 (이전 상태 초기화)
+    this.wsManager.send({
+      type: 'reset'
+    });
+    
+    // 2. 단일 명령어를 메모리에 로드
+    setTimeout(() => {
+      this.wsManager.send({
+        type: 'load_single_instruction',
+        payload: assemblyCode
+      });
+    }, 100);
+    
+    // 3. 바로 한 단계 실행
+    setTimeout(() => {
+      this.wsManager.send({
+        type: 'step'
+      });
+    }, 200);
+    
+    this.cpuState.alu = `실행 중: ${assemblyCode}`;
+    this.notifyStateChange();
+    
+    return true;
   }
-
+  
   // 전체 프로그램 일괄 실행
   runAllProgram() {
     if (!this.wsManager || !this.wsManager.isConnected()) {
