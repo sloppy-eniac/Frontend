@@ -6,18 +6,16 @@
   
   const dispatch = createEventDispatcher();
   
-  let code = `ADD 10, 20
-MOV 30, 60
-SUB 15, 5
-MOV 25, 61
-MUL 3, 4
-MOV 36, 62
-DIV 12, 3
-MOV 33, 63
-MOV 100, 50
-MOV 200, 51`;
-  
-  let singleInstruction = 'ADD 5, 10';
+  let code = `MOV R1, 10
+MOV R2, 20
+ADD R1, R2
+SUB R1, R2
+MOV R3, 3
+MUL R3, R2
+MOV R4, 100
+DIV R4, R3`;
+
+  let singleInstruction = 'ADD R1, 10';
   let speed = 1000;
   let isRunning = false;
   
@@ -212,7 +210,7 @@ MOV 200, 51`;
         <input 
           type="text" 
           bind:value={singleInstruction}
-          placeholder="예: ADD 5, 10"
+          placeholder="예: ADD R1, 10"
           class="instruction-field"
         />
         <button 
@@ -227,12 +225,12 @@ MOV 200, 51`;
       <div class="example-instructions">
         <h4>예제 명령어:</h4>
         <div class="example-buttons">
-          <button class="example-btn" on:click={() => setExampleInstruction('MOV R4, 32')}>MOV R4, 32</button>
           <button class="example-btn" on:click={() => setExampleInstruction('MOV R1, 100')}>MOV R1, 100</button>
           <button class="example-btn" on:click={() => setExampleInstruction('MOV R2, 50')}>MOV R2, 50</button>
-          <button class="example-btn" on:click={() => setExampleInstruction('ADD 5, 10')}>ADD 5, 10</button>
-          <button class="example-btn" on:click={() => setExampleInstruction('SUB 15, 3')}>SUB 15, 3</button>
-          <button class="example-btn" on:click={() => setExampleInstruction('MUL 4, 6')}>MUL 4, 6</button>
+          <button class="example-btn" on:click={() => setExampleInstruction('ADD R1, R2')}>ADD R1, R2</button>
+          <button class="example-btn" on:click={() => setExampleInstruction('ADD R1, 10')}>ADD R1, 10</button>
+          <button class="example-btn" on:click={() => setExampleInstruction('SUB R1, 3')}>SUB R1, 3</button>
+          <button class="example-btn" on:click={() => setExampleInstruction('MUL R1, 6')}>MUL R1, 6</button>
         </div>
       </div>
     </div>
@@ -320,28 +318,28 @@ MOV 200, 51`;
   
   <h3>🎯 명령어 예제</h3>
   <div class="examples">
-    <button on:click={() => assemblyInput = 'MOV R4, 32'} class="example-btn">
-      MOV R4, 32
-    </button>
-    <button on:click={() => assemblyInput = 'MOV R2, 50'} class="example-btn">
-      MOV R2, 50
-    </button>
-    <button on:click={() => assemblyInput = 'ADD R4, R2'} class="example-btn">
-      ADD R4, R2
-    </button>
-    <button on:click={() => assemblyInput = 'SUB R4, R2'} class="example-btn">
-      SUB R4, R2
-    </button>
-    <button on:click={() => assemblyInput = 'MUL R4, R2'} class="example-btn">
-      MUL R4, R2
-    </button>
-    <button on:click={() => assemblyInput = 'DIV R4, R2'} class="example-btn">
-      DIV R4, R2
-    </button>
-    <button on:click={() => assemblyInput = 'MOV R1, 100'} class="example-btn">
+    <button on:click={() => singleInstruction = 'MOV R1, 100'} class="example-btn">
       MOV R1, 100
     </button>
-    <button on:click={() => assemblyInput = 'MOV R3, 255'} class="example-btn">
+    <button on:click={() => singleInstruction = 'MOV R2, 50'} class="example-btn">
+      MOV R2, 50
+    </button>
+    <button on:click={() => singleInstruction = 'ADD R1, R2'} class="example-btn">
+      ADD R1, R2
+    </button>
+    <button on:click={() => singleInstruction = 'SUB R1, R2'} class="example-btn">
+      SUB R1, R2
+    </button>
+    <button on:click={() => singleInstruction = 'MUL R1, R2'} class="example-btn">
+      MUL R1, R2
+    </button>
+    <button on:click={() => singleInstruction = 'DIV R1, R2'} class="example-btn">
+      DIV R1, R2
+    </button>
+    <button on:click={() => singleInstruction = 'ADD R3, 100'} class="example-btn">
+      ADD R3, 100
+    </button>
+    <button on:click={() => singleInstruction = 'MOV R3, 255'} class="example-btn">
       MOV R3, 255
     </button>
   </div>
