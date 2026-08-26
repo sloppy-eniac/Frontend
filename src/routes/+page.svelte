@@ -6,14 +6,16 @@
   
   let cpuState = {
     pc: 0,
-    registers: { 
-      register1: 0, 
-      register2: 0, 
+    registers: {
+      register1: 0,
+      register2: 0,
       register3: 0,
       register4: 0,
       register5: 0,
       register6: 0,
-      register7: 0
+      register7: 0,
+      overflow_flag: false,
+      zero_flag: false
     },
     memory: new Array(256).fill(0),
     cache: [],

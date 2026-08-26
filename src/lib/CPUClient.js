@@ -15,7 +15,8 @@ export default class CPUClient {
         register5: 0,
         register6: 0,
         register7: 0,
-        overflow_flag: false
+        overflow_flag: false,
+        zero_flag: false
       },
       memory: new Array(256).fill(0),
       alu: '대기 중...',
@@ -97,7 +98,8 @@ export default class CPUClient {
     this.cpuState.registers.register6 = state.register6 || 0;
     this.cpuState.registers.register7 = state.register7 || 0;
     this.cpuState.registers.overflow_flag = state.overflow_flag || false;
-    
+    this.cpuState.registers.zero_flag = state.zero_flag || false;
+
     this.notifyStateChange();
   }
   
@@ -214,14 +216,16 @@ export default class CPUClient {
       console.warn('CPU 서버에 연결되지 않음 - 로컬 리셋 실행');
       // 로컬 상태만 리셋
       this.cpuState.pc = 0;
-      this.cpuState.registers = { 
-        register1: 0, 
-        register2: 0, 
+      this.cpuState.registers = {
+        register1: 0,
+        register2: 0,
         register3: 0,
         register4: 0,
         register5: 0,
         register6: 0,
-        register7: 0
+        register7: 0,
+        overflow_flag: false,
+        zero_flag: false
       };
       this.cpuState.memory.fill(0);
       this.cpuState.alu = '대기 중...';

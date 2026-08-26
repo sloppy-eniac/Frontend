@@ -7,7 +7,7 @@
   $: {
     // 메모리 변경 감지
     memory.forEach((value, index) => {
-      if (index < 64 && value !== previousMemory[index]) {
+      if (index < 32 && value !== previousMemory[index]) {
         highlightedCells[index] = true;
         setTimeout(() => {
           highlightedCells[index] = false;
@@ -18,8 +18,8 @@
     previousMemory = [...memory];
   }
   
-  // 64바이트만 표시
-  $: displayMemory = memory.slice(0, 64);
+  // 32바이트만 표시
+  $: displayMemory = memory.slice(0, 32);
   
   // 명령어 영역 판별 - 정확한 명령어 영역만 감지
   function isInstructionArea(index) {
@@ -32,7 +32,7 @@
         // 유효한 명령어인지 확인 (opcode가 0-4 범위)
         const instruction = (memory[i] << 8) | memory[i + 1];
         const opcode = (instruction >> 12) & 0xF;
-        if (opcode <= 4) { // ADD, SUB, MUL, DIV, MOV
+        if (opcode <= 8) { // ADD, SUB, MUL, DIV, MOV, CMP, JMP, JE, JNE
           instructionEnd = i + 1;
         } else {
           // 유효하지 않은 opcode가 나오면 명령어 영역 끝
@@ -78,33 +78,45 @@
   // 명령어 바이트를 어셈블리로 변환
   function getInstructionText(index) {
     if (index % 2 !== 0 || index + 1 >= memory.length) return '';
-    
+
     const byte1 = memory[index];
     const byte2 = memory[index + 1];
-    
+
     if (byte1 === 0 && byte2 === 0) return '';
-    
+
     // 16비트 명령어 재구성
     const instruction = (byte1 << 8) | byte2;
-    
-    // 수정된 비트 배치: 4비트 opcode + 6비트 reg1 + 6비트 reg2
     const opcode = (instruction >> 12) & 0xF;
-    const reg1 = (instruction >> 6) & 0x3F;  // 6비트
-    const reg2 = instruction & 0x3F;         // 6비트
-    
-    const opcodes = ['ADD', 'SUB', 'MUL', 'DIV', 'MOV'];
-    if (opcode < opcodes.length) {
-      return `${opcodes[opcode]} ${reg1}, ${reg2}`;
+
+    const opcodes = ['ADD', 'SUB', 'MUL', 'DIV', 'MOV', 'CMP', 'JMP', 'JE', 'JNE'];
+    if (opcode > 8) return '';
+
+    // JMP/JE/JNE: 주소만 표시
+    if (opcode >= 6) {
+      const address = instruction & 0xFF;
+      return `${opcodes[opcode]} ${address}`;
     }
-    
-    return '';
+
+    // Type I/R 구분
+    const mode = (instruction >> 11) & 0x1;
+    const rd = (instruction >> 8) & 0x7;
+
+    if (mode === 1) {
+      // Type R: 레지스터 + 레지스터
+      const rs = (instruction >> 5) & 0x7;
+      return `${opcodes[opcode]} R${rd}, R${rs}`;
+    } else {
+      // Type I: 레지스터 + 즉시값
+      const imm = instruction & 0xFF;
+      return `${opcodes[opcode]} R${rd}, ${imm}`;
+    }
   }
 </script>
 
 <div class="card">
   <div class="card-header">
     <div class="header-content">
-      <h3 class="card-title">메모리 (64바이트)</h3>
+      <h3 class="card-title">메모리 (32바이트)</h3>
       <div class="legend">
         <div class="legend-item">
           <div class="legend-color instruction"></div>

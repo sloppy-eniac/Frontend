@@ -1,20 +1,21 @@
 <script>
-  export let registers = { 
-    register1: 0, 
-    register2: 0, 
+  export let registers = {
+    register1: 0,
+    register2: 0,
     register3: 0,
     register4: 0,
     register5: 0,
     register6: 0,
     register7: 0,
-    overflow_flag: false  // OF 플래그 추가
+    overflow_flag: false,
+    zero_flag: false
   };
   
   let previousValues = { ...registers };
   let highlightedRegs = {};
   let highlightedFlags = {};
   
-  // 레지스터 이름 매핑 (R7을 resultR로 변경)
+  // 레지스터 이름 매핑
   const registerNames = {
     register1: 'R1',
     register2: 'R2', 
@@ -22,13 +23,13 @@
     register4: 'R4',
     register5: 'R5',
     register6: 'R6',
-    register7: 'resultR'  // R7을 resultR로 표시
+    register7: 'R7'
   };
   
   $: {
     // 값 변경 감지 및 하이라이트
     Object.keys(registers).forEach(reg => {
-              if (reg === 'overflow_flag') {
+      if (reg === 'overflow_flag' || reg === 'zero_flag') {
         if (registers[reg] !== previousValues[reg]) {
           highlightedFlags[reg] = true;
           setTimeout(() => {
@@ -55,38 +56,49 @@
   <div class="card-content">
     <div class="registers-grid">
       {#each Object.entries(registers) as [regKey, value]}
-        {#if regKey !== 'overflow_flag'}
-          <div 
-            class="register-item" 
+        {#if regKey !== 'overflow_flag' && regKey !== 'zero_flag'}
+          <div
+            class="register-item"
             class:highlight={highlightedRegs[regKey]}
-            class:result-register={regKey === 'register7'}
           >
             <div class="register-name">{registerNames[regKey]}</div>
             <div class="register-value">{value}</div>
-            <div class="register-info">{regKey === 'register7' ? '연산결과' : regKey}</div>
+            <div class="register-info">{regKey}</div>
           </div>
         {/if}
       {/each}
     </div>
     
     <!-- 플래그 섹션 -->
-    <!-- <div class="flags-section">
+    <div class="flags-section">
       <h4 class="flags-title">플래그 레지스터</h4>
       <div class="flags-grid">
-        <div 
-          class="flag-item" 
-                class:highlight={highlightedFlags.overflow_flag}
-      class:flag-set={registers.overflow_flag}
+        <div
+          class="flag-item"
+          class:highlight={highlightedFlags.overflow_flag}
+          class:flag-set={registers.overflow_flag}
         >
-                      <div class="flag-name">OF</div>
-                      <div class="flag-value">{registers.overflow_flag ? '1' : '0'}</div>
-                      <div class="flag-info">Overflow Flag</div>
-            <div class="flag-description">
-              {registers.overflow_flag ? '부호 있는 정수 오버플로우' : '정상'}
-            </div>
+          <div class="flag-name">OF</div>
+          <div class="flag-value">{registers.overflow_flag ? '1' : '0'}</div>
+          <div class="flag-info">Overflow Flag</div>
+          <div class="flag-description">
+            {registers.overflow_flag ? '오버플로우 발생' : '정상'}
+          </div>
+        </div>
+        <div
+          class="flag-item"
+          class:highlight={highlightedFlags.zero_flag}
+          class:flag-set={registers.zero_flag}
+        >
+          <div class="flag-name">ZF</div>
+          <div class="flag-value">{registers.zero_flag ? '1' : '0'}</div>
+          <div class="flag-info">Zero Flag</div>
+          <div class="flag-description">
+            {registers.zero_flag ? 'CMP 결과 같음' : 'CMP 결과 다름'}
+          </div>
         </div>
       </div>
-    </div> -->
+    </div>
   </div>
 </div>
 
@@ -185,21 +197,6 @@
     font-size: 0.75rem;
     color: hsl(215.4 16.3% 46.9%);
     font-family: ui-monospace, SFMono-Regular, monospace;
-  }
-  
-  .register-item.result-register {
-    background: linear-gradient(135deg, hsl(120 100% 95%), hsl(120 100% 90%));
-    border-color: hsl(120 100% 70%);
-  }
-  
-  .register-item.result-register .register-name {
-    color: hsl(120 100% 30%);
-    font-weight: 700;
-  }
-  
-  .register-item.result-register .register-value {
-    border-color: hsl(120 100% 70%);
-    background: hsl(120 100% 98%);
   }
   
   /* 플래그 섹션 스타일 */

@@ -74,42 +74,42 @@
   }
   
   .card-content {
-    padding: 1rem 1.5rem 1.5rem;
+    padding: 0.75rem 1.5rem 1rem;
   }
-  
+
   .status-group {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
   }
-  
+
   .status-item {
     background: hsl(210 40% 98%);
     border: 1px solid hsl(214.3 31.8% 91.4%);
     border-radius: 0.375rem;
-    padding: 1rem;
+    padding: 0.625rem;
     text-align: center;
+    flex: 1;
   }
-  
+
   .label {
     color: hsl(215.4 16.3% 46.9%);
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     font-weight: 500;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
   }
-  
+
   .pc-value {
     font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-    font-size: 1.875rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: hsl(142.1 76.2% 36.3%);
     background: hsl(0 0% 100%);
-    padding: 0.75rem 1rem;
+    padding: 0.375rem 0.75rem;
     border-radius: 0.25rem;
     border: 1px solid hsl(214.3 31.8% 91.4%);
     display: inline-block;
-    min-width: 4rem;
+    min-width: 3rem;
     transition: all 0.3s ease;
   }
   
@@ -123,26 +123,26 @@
   
   .instruction-value {
     font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     font-weight: 500;
     color: hsl(222.2 84% 4.9%);
     background: hsl(0 0% 100%);
-    padding: 0.75rem 1rem;
+    padding: 0.375rem 0.75rem;
     border-radius: 0.25rem;
     border: 1px solid hsl(214.3 31.8% 91.4%);
-    min-height: 2.5rem;
+    min-height: 2rem;
     word-break: break-all;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  
+
   .execution-indicator {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
     background: hsl(210 40% 98%);
     border: 1px solid hsl(214.3 31.8% 91.4%);
     border-radius: 0.375rem;

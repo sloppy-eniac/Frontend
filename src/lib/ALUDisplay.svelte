@@ -71,22 +71,22 @@
   }
   
   .card-content {
-    padding: 1rem 1.5rem 1.5rem;
+    padding: 0.75rem 1.5rem 1rem;
   }
-  
+
   .operation-display {
     background: hsl(210 40% 98%);
     border: 1px solid hsl(214.3 31.8% 91.4%);
     border-radius: 0.375rem;
-    padding: 1.5rem 1rem;
+    padding: 1rem;
     text-align: center;
     position: relative;
-    min-height: 5rem;
+    min-height: 3.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
     transition: all 0.3s ease;
   }
   
