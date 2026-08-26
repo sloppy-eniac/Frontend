@@ -6,14 +6,12 @@
   
   const dispatch = createEventDispatcher();
   
-  let code = `MOV R1, 10
-MOV R2, 20
+  let code = `MOV R1, 0
+MOV R2, 1
 ADD R1, R2
-SUB R1, R2
-MOV R3, 3
-MUL R3, R2
-MOV R4, 100
-DIV R4, R3`;
+CMP R1, 10
+JNE 4
+MOV R3, 255`;
 
   let singleInstruction = 'ADD R1, 10';
   let speed = 1000;
